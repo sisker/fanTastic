@@ -1,8 +1,20 @@
 README
-AUTHORS
-THANKS
+
+AUTHORS: https://github.com/sisker
+
+THANKS: FreeNode ##php, #eligius, #git members
+
 CHANGELOG
+
 NEWS
+
 INSTALL
+apt-get install git php5-cli
+cd ~
+git clone git://github.com/sisker/fanTastic.git
+cd fanTastic
+php fan.php
+
 COPYING / LICENSE
+
 BUGS
