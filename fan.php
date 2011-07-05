@@ -1,5 +1,6 @@
 <?PHP
 
+
 function countGPUs(){
   //command line output from aticonfig --lsa
   $cmd = "aticonfig aticonfig --lsa";
