@@ -8,7 +8,7 @@ CHANGELOG
 
 NEWS
 
-INSTALL
+INSTALL (Ubuntu 11.04 Desktop)
 apt-get install git php5-cli
 cd ~
 git clone git://github.com/sisker/fanTastic.git
