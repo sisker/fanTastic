@@ -149,7 +149,7 @@ function maintainGPUs($gpus){
       }
     }
     if ( ($optimalTemp-$tolerance <= $temp) && ($temp <= $optimalTemp+$tolerance) ){
-      echo("Just Right");
+      echo("Temp OK");
     }
     echo("\n");
     $adapter++;
