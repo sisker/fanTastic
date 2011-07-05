@@ -128,7 +128,7 @@ function maintainGPUs($gpus){
   while ($adapter < $count){
     $temp=$gpus[$adapter][12];
     $fan=$gpus[$adapter][11];
-    echo ("GPU:$adapter Temp: $temp Fan: $fan. ");
+    echo ("GPU:$adapter Temp: $temp Fan: str_pad($fan, 3);. ");
     if ($temp > ($optimalTemp+$tolerance)){
       if ($fan < 100){
         echo("Too Hot, Increasing Fan");
