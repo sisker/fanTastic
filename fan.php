@@ -3,7 +3,7 @@
 
 function countGPUs(){
   //command line output from aticonfig --lsa
-  $cmd = "aticonfig aticonfig --lsa";
+  $cmd = "DISPLAY=:0.0 aticonfig aticonfig --lsa";
   exec($cmd, $output);
 
   //find ati series number
