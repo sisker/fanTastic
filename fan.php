@@ -226,9 +226,9 @@ function maintainGPUs($gpus){
 				adjustFan(&$gpus,$adapter,30);
 			}
 		}
-		if ( ($optimalTemp-$tolerance <= $temp) && ($temp <= $optimalTemp+$tolerance) ){
-			echo("Temp OK");
-		}
+		//if ( ($optimalTemp-$tolerance <= $temp) && ($temp <= $optimalTemp+$tolerance) ){
+		//	echo("Temp OK");
+		//}
 		echo("\n");
 		$adapter++;
 	}
