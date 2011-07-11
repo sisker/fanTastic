@@ -121,7 +121,7 @@ function printStats($gpus){
 }
 
 function maintainGPUs($gpus){
-  $optimalTemp = 75;
+  $optimalTemp = 77;
   $tolerance = 1;
   $count = countGPUs();
   $adapter=0;
