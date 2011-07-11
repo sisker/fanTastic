@@ -218,7 +218,12 @@ function maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningFan,$warningLoad
 		if ($temp > ($optimalTemp+$toleranceTemp)){
 			if ($fan < 100){
 				echo("Too Hot, Increasing Fan");
-				adjustFan(&$gpus,$adapter,$fan+1);
+                                if ($temp > 80){
+                                	adjustFan(&$gpus,$adapter,100);
+				}
+				else{
+					adjustFan(&$gpus,$adapter,$fan+1);
+				}
 			}
 			if ($fan == 100){
 				echo('ALERT! Fan at 100%');
