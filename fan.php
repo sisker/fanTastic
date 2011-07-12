@@ -217,8 +217,8 @@ function maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningFan,$warningLoad
 		echo ("GPU:$adapter Load: $loadColor Temp: $tempColor Fan: $fanColor ");
 		if ($temp > ($optimalTemp+$toleranceTemp)){
 			if ($fan < 100){
-				echo("Too Hot, Increasing Fan");
-                                if ($temp > 80){
+				echo("Increasing Fan");
+                                if ($temp > 85){
                                 	adjustFan(&$gpus,$adapter,100);
 				}
 				else{
@@ -226,17 +226,17 @@ function maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningFan,$warningLoad
 				}
 			}
 			if ($fan == 100){
-				echo('ALERT! Fan at 100%');
+				echo('ALERT!');
 			}
 		}
 		if ($temp < ($optimalTemp-$toleranceTemp)){
-			if ($fan > 30){
-				echo("Too Cold, Decreasing Fan");
+			if ($fan > 40){
+				echo("Decreasing Fan");
 				adjustFan(&$gpus,$adapter,$fan-1);
 			}
-			if ($fan <= 30){
-				echo("At Minimun Fan Speed 30%");
-				adjustFan(&$gpus,$adapter,30);
+			if ($fan <= 40){
+				echo("At Minimun Fan Speed 40%");
+				adjustFan(&$gpus,$adapter,40);
 			}
 		}
 		//if ( ($optimalTemp-$tolerance <= $temp) && ($temp <= $optimalTemp+$tolerance) ){
@@ -253,7 +253,7 @@ function maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningFan,$warningLoad
 $gpus = Array();
 
 //Set these to where you want them. Best advice is keep temp below 80c and fan below 80% for longer life.
-$optimalTemp = 77;
+$optimalTemp = 75;
 $toleranceTemp = 1;
 $warningFan = 80;
 $warningLoad = 95;
