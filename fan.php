@@ -232,12 +232,12 @@ function maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningTemp,$warningFan
 		}
 
 
-		echo ("GPU:$adapter Load:$loadColor CoreClock:$coreColor Temp:$tempColor Fan:$fanColor ");
+		echo ("GPU:$adapter $cocucl"."Mhz"." Load:$loadColor CoreClock:$coreColor Temp:$tempColor Fan:$fanColor ");
 
                 //too hot, increase fan, lower core speed
 		if ($temp > ($optimalTemp+$toleranceTemp)){
 			if ($fan < 100){
-				echo("Increasing Fan");
+				echo("Increasing Fan ");
                                 if ($temp > $warningTemp){
                                 	adjustFan($gpus,$adapter,100);
 				}
@@ -254,19 +254,24 @@ function maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningTemp,$warningFan
 			}
 		}
 
-                //too cold, lower fan speed, increase core speed
-		if ($temp < ($optimalTemp-$toleranceTemp)){
-			//if core was underclocked, restore it gradually
-			if ( ($cocucl+10) <= ($comax) ){ 
-				adjustCore($gpus,$adapter,$cocucl+10);
+
+		//increase clock, if temps and fan are cool
+		if ($fan <= ($warningFan-10)){
+			//if (($cocucl+5) <= ($comax+($comax*0.10))){
+			if (($cocucl+5) <= ($comax)){ 
+				adjustCore($gpus,$adapter,$cocucl+5);
 				echo("Increasing Core. ");
 			}
+		}
+
+                //too cold
+		if ($temp < ($optimalTemp-$toleranceTemp)){
 			if ($fan > $minimumFan){
-				echo("Decreasing Fan");
+				echo("Decreasing Fan. ");
 				adjustFan($gpus,$adapter,$fan-1);
 			}
 			if ($fan <= $minimumFan){
-				echo("At Minimun Fan Speed $minimumFan%");
+				//echo("At Minimun Fan Speed $minimumFan%");
 				adjustFan($gpus,$adapter,$minimumFan);
 			}
 		}
