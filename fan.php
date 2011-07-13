@@ -286,7 +286,7 @@ function maintainGPUs($gpus){
 			}
 		}
 		//if tempLow and fanLow, increase core
-		if ((!$tempHigh) && (!$fanHigh) && ($temp<($optimalTemp-$toleranceTemp)) ){
+		if ((!$tempHigh) && (!$fanHigh) ){
 			//if the core isn't already at max and in use
 			if (($cocucl < $comax) && ($load>10)){
 				echo "increase core";
