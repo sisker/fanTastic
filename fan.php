@@ -256,7 +256,7 @@ function maintainGPUs($gpus){
 		//is the fan High or Low
 		$fanHigh = FALSE;
 		if ($fan>=$maxFan){$fanHigh = TRUE;}
-
+		
 		//if tempHigh and fanHigh, decrease core
 		if ( ($tempHigh) && ($fanHigh) && ($temp>($optimalTemp+$toleranceTemp)) ){
 			echo "decrease core";
@@ -266,7 +266,7 @@ function maintainGPUs($gpus){
 			}
 		}
 		//if tempHigh and fanLow, increase fan
-		if ( ($tempHigh) && (!$fanHigh) && ($temp>($optimalTemp+$toleranceTemp)) ){
+		if ( ($tempHigh) && (!$fanHigh) ){
 			echo "increase fan";
 			//if temp is greater than maxTemp snap to 80, else, go normally.
 			if ($temp>$maxTemp) {
@@ -286,7 +286,7 @@ function maintainGPUs($gpus){
 			}
 		}
 		//if tempLow and fanLow, increase core
-		if ((!$tempHigh) && (!$fanHigh) ){
+		if ( (!$tempHigh) && ($fan<75) ){
 			//if the core isn't already at max and in use
 			if (($cocucl < $comax) && ($load>10)){
 				echo "increase core";
