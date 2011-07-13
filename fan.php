@@ -289,7 +289,7 @@ function maintainGPUs($gpus){
 			//if the core isn't already at max and in use
 			if (($cocucl < $comax) && ($load>10)){
 				echo "increase core";
-				//adjustCore($gpus,$adapter,$cocucl+0);
+				//adjustCore($gpus,$adapter,$cocucl+5);
 			}
 			//the core is maxxed out, can lower fan speed (this will happen when no mining)
 			else{
