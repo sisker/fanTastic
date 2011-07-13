@@ -149,8 +149,14 @@ function queryGpus(&$gpus){
 	}
 }
 
-function adjustFan($gpus,$adapter,$fan){
-	$cmd_odsc = "DISPLAY=:0.$adapter aticonfig --pplib-cmd \"set fanspeed 0 $fan\"";
+function adjustFan($gpus,$adapter,$speed){
+	$cmd_odsc = "DISPLAY=:0.$adapter aticonfig --pplib-cmd \"set fanspeed 0 $speed\"";
+	exec($cmd_odsc, $output);
+}
+
+function adjustCore($gpus,$adapter,$speed){
+        $mecupe = $gpus[$adapter][5];
+	$cmd_odsc = "DISPLAY=:0.$adapter aticonfig --odsc=$speed,$mecupe --adapter=$adapter";
 	exec($cmd_odsc, $output);
 }
 
@@ -180,23 +186,28 @@ function printStats($gpus){
 	}
 }
 
-function maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningFan,$warningLoad){
+function maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningTemp,$warningFan,$warningLoad,$minimumFan,$warningCore){
 	$count = countGPUs();
 	$adapter=0;
 	while ($adapter < $count){
 		$temp=$gpus[$adapter][12];
 		$fan=$gpus[$adapter][11];
                 $load=$gpus[$adapter][10];
+		$cocucl=$gpus[$adapter][2];
+                $comax=$gpus[$adapter][7];
+		$comin=$gpus[$adapter][6];
+                $corePercent=number_format( ($cocucl / $comax)*100 );
 		$fanString = str_pad($fan,3,' ',STR_PAD_LEFT);
                 $loadString = str_pad($load,3,' ',STR_PAD_LEFT);
+                $coreString = str_pad($corePercent,3,' ',STR_PAD_LEFT);
 
 		$colors = new Colors();
 		//color temp
 		if ($temp>($optimalTemp+$toleranceTemp)){
-			$tempColor = $colors->getColoredString("$temp C", "red", "");
+			$tempColor = $colors->getColoredString("$temp", "red", "");
 		}
 		else{
-			$tempColor = $colors->getColoredString("$temp C", "green", "");
+			$tempColor = $colors->getColoredString("$temp", "green", "");
 		}
 		//color fan
 		if ($fan>$warningFan){
@@ -212,36 +223,53 @@ function maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningFan,$warningLoad
 		else{
 			$loadColor = $colors->getColoredString("$loadString%", "green", "");
 		}
+		//color core
+		if ($corePercent<$warningCore){
+			$coreColor = $colors->getColoredString("$coreString%", "red", "");
+		}
+		else{
+			$coreColor = $colors->getColoredString("$coreString%", "green", "");
+		}
 
 
-		echo ("GPU:$adapter Load: $loadColor Temp: $tempColor Fan: $fanColor ");
+		echo ("GPU:$adapter Load:$loadColor CoreClock:$coreColor Temp:$tempColor Fan:$fanColor ");
+
+                //too hot, increase fan, lower core speed
 		if ($temp > ($optimalTemp+$toleranceTemp)){
 			if ($fan < 100){
 				echo("Increasing Fan");
-                                if ($temp > 85){
-                                	adjustFan(&$gpus,$adapter,100);
+                                if ($temp > $warningTemp){
+                                	adjustFan($gpus,$adapter,100);
 				}
 				else{
-					adjustFan(&$gpus,$adapter,$fan+1);
+					adjustFan($gpus,$adapter,$fan+1);
 				}
 			}
-			if ($fan == 100){
-				echo('ALERT!');
+			if (($fan == 100) && ($temp > $warningTemp)){
+				echo('ALERT! Reducing Core. ');
+				//reduce core by 10, don't go below core min
+                                if ( ($cocucl-10) >= ($comin) ){ 
+					adjustCore($gpus,$adapter,$cocucl-10);
+				}
 			}
 		}
+
+                //too cold, lower fan speed, increase core speed
 		if ($temp < ($optimalTemp-$toleranceTemp)){
-			if ($fan > 40){
-				echo("Decreasing Fan");
-				adjustFan(&$gpus,$adapter,$fan-1);
+			//if core was underclocked, restore it gradually
+			if ( ($cocucl+10) <= ($comax) ){ 
+				adjustCore($gpus,$adapter,$cocucl+10);
+				echo("Increasing Core. ");
 			}
-			if ($fan <= 40){
-				echo("At Minimun Fan Speed 40%");
-				adjustFan(&$gpus,$adapter,40);
+			if ($fan > $minimumFan){
+				echo("Decreasing Fan");
+				adjustFan($gpus,$adapter,$fan-1);
+			}
+			if ($fan <= $minimumFan){
+				echo("At Minimun Fan Speed $minimumFan%");
+				adjustFan($gpus,$adapter,$minimumFan);
 			}
 		}
-		//if ( ($optimalTemp-$tolerance <= $temp) && ($temp <= $optimalTemp+$tolerance) ){
-		//	echo("Temp OK");
-		//}
 		echo("\n");
 		$adapter++;
 	}
@@ -253,10 +281,14 @@ function maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningFan,$warningLoad
 $gpus = Array();
 
 //Set these to where you want them. Best advice is keep temp below 80c and fan below 80% for longer life.
-$optimalTemp = 75;
+//$constants = Array();
+$optimalTemp = 78;
 $toleranceTemp = 1;
-$warningFan = 80;
+$warningTemp = 85;
+$warningFan = 85;
 $warningLoad = 95;
+$minimumFan = 40;
+$warningCore = 99;
 
 //print all stats
 queryGpus($gpus);
@@ -268,7 +300,7 @@ while (true){
 	//clear the screen
 	//passthru('clear');
 	queryGpus($gpus);
-	maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningFan,$warningLoad);
+	maintainGPUs($gpus,$optimalTemp,$toleranceTemp,$warningTemp,$warningFan,$warningLoad,$minimumFan,$warningCore);
 	sleep(3);
 }
 
