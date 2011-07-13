@@ -216,7 +216,8 @@ function maintainGPUs($gpus){
 		$temp=$gpus[$adapter][12];
 		
 		//comax can't be trusted... statically assigning for now.
-		if ($name == '6900'){$comax=840;}
+		if ($name == '6900'){$comax=850;}
+		if ($name == '5800'){$comax=960;}
 
 		//coloize the numbers
 		$colors = new Colors();
@@ -246,7 +247,7 @@ function maintainGPUs($gpus){
 		}
 
 		//print out the stats
-		echo ("GPU:$adapter $cocucl Load:$loadColor Temp:$tempColor Fan:$fanColor ");
+		echo ("GPU:$adapter $cocucl of $comax Load:$loadColor Temp:$tempColor Fan:$fanColor ");
 
 		//is the temp High or Low
                 $tempHigh = FALSE;
