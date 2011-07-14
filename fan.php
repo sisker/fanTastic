@@ -247,7 +247,7 @@ function printStatsShort($gpus,$adapter,$warningLoad,$warningTemp,$warningFan,$w
 function maintainGPUs($gpus){
 	//constants
 	$optimalTemp = 77;
-	$toleranceTemp = 2;
+	$toleranceTemp = 1;
 	$minFan = 5;
 
 	$warningLoad = 95;
@@ -275,7 +275,7 @@ function maintainGPUs($gpus){
 		printStatsShort($gpus,$adapter,$warningLoad,$warningTemp,$warningFan,$warningCore);
 		
 		//if tempHigh and fanHigh, decrease core
-		if ( ($temp > ($optimalTemp+$toleranceTemp)) && ($fan >= $warningFan) ){
+		if ( ($temp > ($optimalTemp+$toleranceTemp)) && ($fan > $warningFan) ){
 			//if core isn't already at min
 			if ($cocucl > $comin){
 				adjustCore($gpus,$adapter,$cocucl-5);
