@@ -251,8 +251,8 @@ function maintainGPUs($gpus){
 	$minFan = 5;
 
 	$warningLoad = 95;
-	$warningTemp = 81;
-	$warningFan = 81;
+	$warningTemp = 80;
+	$warningFan = 80;
 	$warningCore = 100;
 
 	$count = countGPUs();
@@ -279,7 +279,7 @@ function maintainGPUs($gpus){
 			//if core isn't already at min
 			if ($cocucl > $comin){
 				adjustCore($gpus,$adapter,$cocucl-5);
-				echo "decrease core";
+				echo "decrease core. ";
 			}
 		}
 		//if tempHigh and fanLow, increase fan
@@ -287,12 +287,12 @@ function maintainGPUs($gpus){
 			//if temp is greater than maxTemp snap to 80, else, go normally.
 			if ($temp>$warningTemp) {
 				adjustFan($gpus,$adapter,80);
-				echo "fansnap to 80";
+				echo "fansnap to 80. ";
 			}
 			else{
 				($fan < $warningFan);
 				adjustFan($gpus,$adapter,$fan+1);
-				echo "increase fan";
+				echo "increase fan. ";
 			}
 		}
 		//if tempLow, decrease fan
@@ -300,7 +300,7 @@ function maintainGPUs($gpus){
 			//if the fan isn't already at min
 			if ($fan > $minFan){
 				adjustFan($gpus,$adapter,$fan-1);
-				echo "decrease fan";
+				echo "decrease fan. ";
 			}
 		}
 		//if tempLow and fanLow, increase core
@@ -308,7 +308,7 @@ function maintainGPUs($gpus){
 			//if the core isn't already at max and in use
 			if (($cocucl < $comax) && ($load>10)){
 				adjustCore($gpus,$adapter,$cocucl+5);
-				echo "increase core";
+				echo "increase core. ";
 			}
 		}
 
