@@ -265,7 +265,7 @@ function maintainGPUs($gpus){
 	$minFan = 5;
 
 	$warningLoad = 95;
-	$warningTemp = 80;
+	$warningTemp = $optimalTemp+$toleranceTemp+1;
 	$warningFan = 80;
 	$warningCore = 100;
 
