@@ -142,7 +142,7 @@ function getTemp(&$gpus,$adapter){
 }
 
 function getTime(&$gpus,$adapter){
-	$mysqldate = date('H:i:s');
+	$mysqldate = date('Y-m-d H:i:s');
 	$gpus[$adapter][13]=$mysqldate;
 }
 
@@ -255,7 +255,45 @@ function printStatsShort($gpus,$adapter,$warningLoad,$warningTemp,$warningFan,$w
 	}
 
 	//print out the stats
-	echo ("$time GPU$adapter: $cocucl($comin-$comax) $coreColor Load:$loadColor Temp:$tempColor Fan:$fanColor ");
+	echo ("GPU$adapter: $cocucl($comin-$comax) $coreColor Load:$loadColor Temp:$tempColor Fan:$fanColor ");
+}
+
+function connectDB(&$dbConn){
+	$dbConn = mysql_connect("__HOST__","___USER___","___PASSWORD___");
+	if (!$dbConn){
+  		die('Could not connect: ' . mysql_error());
+  	}
+	mysql_select_db("bitcoin", $dbConn);
+}
+
+function writeStatsToDB($gpus,$dbConn){
+	$count = countGPUs();
+	$adapter = 0;
+	while ($adapter < $count){
+		$name=$gpus[$adapter][1];
+		$cocucl=$gpus[$adapter][2];
+		$mecucl=$gpus[$adapter][3];
+		$cocupe=$gpus[$adapter][4];
+		$mecupe=$gpus[$adapter][5];
+		$comin=$gpus[$adapter][6];
+		$comax=$gpus[$adapter][7];
+		$memin=$gpus[$adapter][8];
+		$memax=$gpus[$adapter][9];
+		$load=$gpus[$adapter][10];
+		$fan=$gpus[$adapter][11];
+		$temp=$gpus[$adapter][12];
+		$time=$gpus[$adapter][13];
+		$host=gethostname();
+
+		$query = ("INSERT INTO miners (name,cocucl,mecucl,cocupe,mecupe,comin,comax,memin,memax,gpuLoad,fan,temp,logTime,host,adapter) 
+			  VALUES ('$name','$cocucl','$mecucl','$cocupe','$mecupe','$comin','$comax','$memin','$memax','$load','$fan','$temp','$time','$host','$adapter')");
+
+		if (!mysql_query($query,$dbConn)){
+  			die('Error: ' . mysql_error());
+		}	
+
+		$adapter++;
+	}
 }
 
 function maintainGPUs($gpus){
@@ -341,6 +379,7 @@ function maintainGPUs($gpus){
 //////////////////////////////////////
 
 $gpus = Array();
+connectDB($dbConn);
 //print all stats
 queryGpus($gpus);
 echo ("\n");
@@ -351,9 +390,11 @@ while (true){
 	//clear the screen
 	//passthru('clear');
 	queryGpus($gpus);
+	writeStatsToDB($gpus,$dbConn);
 	maintainGPUs($gpus);
 	sleep(5);
 }
 
+mysql_close($dbConn);
 
 ?>
