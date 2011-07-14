@@ -295,8 +295,8 @@ function maintainGPUs($gpus){
 				echo "increase fan";
 			}
 		}
-		//if tempLow and fanHigh, decrease fan
-		if ( ($temp < ($optimalTemp-$toleranceTemp)) && ($fan >= $warningFan) ){
+		//if tempLow, decrease fan
+		if ( ($temp < ($optimalTemp-$toleranceTemp)) ){
 			//if the fan isn't already at min
 			if ($fan > $minFan){
 				adjustFan($gpus,$adapter,$fan-1);
