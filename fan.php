@@ -142,7 +142,7 @@ function getTemp(&$gpus,$adapter){
 }
 
 function getTime(&$gpus,$adapter){
-	$mysqldate = date('Y-m-d H:i:s');
+	$mysqldate = date('H:i:s');
 	$gpus[$adapter][13]=$mysqldate;
 }
 
@@ -255,7 +255,7 @@ function printStatsShort($gpus,$adapter,$warningLoad,$warningTemp,$warningFan,$w
 	}
 
 	//print out the stats
-	echo ("$time GPU$adapter: Core: $cocucl($comin-$comax) $coreColor Load:$loadColor Temp:$tempColor Fan:$fanColor ");
+	echo ("$time GPU$adapter: $cocucl($comin-$comax) $coreColor Load:$loadColor Temp:$tempColor Fan:$fanColor ");
 }
 
 function maintainGPUs($gpus){
