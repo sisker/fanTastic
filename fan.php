@@ -260,7 +260,7 @@ function printStatsShort($gpus,$adapter,$warningLoad,$warningTemp,$warningFan,$w
 
 function maintainGPUs($gpus){
 	//constants
-	$optimalTemp = 77;
+	$optimalTemp = 79;
 	$toleranceTemp = 1;
 	$minFan = 5;
 
