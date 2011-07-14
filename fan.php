@@ -141,6 +141,11 @@ function getTemp(&$gpus,$adapter){
 	$gpus[$adapter][12]=$result[0][0];	
 }
 
+function getTime(&$gpus,$adapter){
+	$mysqldate = date('Y-m-d H:i:s');
+	$gpus[$adapter][13]=$mysqldate;
+}
+
 function queryGpus(&$gpus){
 	//How many GPUs?
 	$num = countGPUs();
@@ -148,8 +153,8 @@ function queryGpus(&$gpus){
 	
 	while ($adapter<$num){
 		//Make an array for each gpu
-		//gpus	array |0      |1   |2     |3     |4     |5     |6    |7    |8    |9    |10  |11 |12
-		//            |adapter|name|cocucl|mecucl|cocupe|mecupe|comin|comax|memin|memax|load|fan|temp
+		//gpus	array |0      |1   |2     |3     |4     |5     |6    |7    |8    |9    |10  |11 |12  |13
+		//            |adapter|name|cocucl|mecucl|cocupe|mecupe|comin|comax|memin|memax|load|fan|temp|time
 
 		//get cores info [0..10]
 		getCores($gpus,$adapter);
@@ -157,6 +162,8 @@ function queryGpus(&$gpus){
 		getFan($gpus,$adapter);	
 		//get temp info [12]
 		getTemp($gpus,$adapter);
+		//timestamp
+		getTime($gpus,$adapter);
 		$adapter++;
 	}
 }
@@ -205,6 +212,7 @@ function printStatsShort($gpus,$adapter,$warningLoad,$warningTemp,$warningFan,$w
 	$load=$gpus[$adapter][10];
 	$fan=$gpus[$adapter][11];
 	$temp=$gpus[$adapter][12];
+	$time=$gpus[$adapter][13];
 
 	$corePercent = number_format( ($cocucl/$comax)*100 );
 
@@ -247,7 +255,7 @@ function printStatsShort($gpus,$adapter,$warningLoad,$warningTemp,$warningFan,$w
 	}
 
 	//print out the stats
-	echo ("GPU$adapter: Core: $cocucl($comin-$comax) $coreColor Load:$loadColor Temp:$tempColor Fan:$fanColor ");
+	echo ("$time GPU$adapter: Core: $cocucl($comin-$comax) $coreColor Load:$loadColor Temp:$tempColor Fan:$fanColor ");
 }
 
 function maintainGPUs($gpus){
@@ -285,7 +293,7 @@ function maintainGPUs($gpus){
 			//if core isn't already at min
 			if ($cocucl > $comin){
 				adjustCore($gpus,$adapter,$cocucl-5);
-				echo "decrease core. ";
+				echo "core -5Mhz. ";
 			}
 		}
 		//if tempHigh and fanLow, increase fan
@@ -293,12 +301,18 @@ function maintainGPUs($gpus){
 			//if temp is greater than maxTemp snap to 80, else, go normally.
 			if ($temp>$warningTemp) {
 				adjustFan($gpus,$adapter,80);
-				echo "fansnap to 80. ";
+				echo "fan snap 80%. ";
 			}
 			else{
 				($fan < $warningFan);
-				adjustFan($gpus,$adapter,$fan+10);
-				echo "increase fan. ";
+				if ($fan < 70){
+					adjustFan($gpus,$adapter,$fan+10);
+					echo "fan +10%. ";
+				}
+				else{
+					adjustFan($gpus,$adapter,$fan+1);
+					echo "fan +1%. ";
+				}
 			}
 		}
 		//if tempLow, decrease fan
@@ -306,15 +320,15 @@ function maintainGPUs($gpus){
 			//if the fan isn't already at min
 			if ($fan > $minFan){
 				adjustFan($gpus,$adapter,$fan-1);
-				echo "decrease fan. ";
+				echo "fan -1%. ";
 			}
 		}
 		//if tempLow and fanLow, increase core
 		if ( ($temp < ($optimalTemp-$toleranceTemp)) && ($fan<$warningFan) ){
 			//if the core isn't already at max and in use
 			if (($cocucl < $comax) && ($load>10)){
-				adjustCore($gpus,$adapter,$cocucl+1);
-				echo "increase core. ";
+				adjustCore($gpus,$adapter,$cocucl+5);
+				echo "core +5Mhz. ";
 			}
 		}
 
