@@ -297,7 +297,7 @@ function maintainGPUs($gpus){
 			}
 			else{
 				($fan < $warningFan);
-				adjustFan($gpus,$adapter,$fan+1);
+				adjustFan($gpus,$adapter,$fan+10);
 				echo "increase fan. ";
 			}
 		}
