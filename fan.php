@@ -100,9 +100,15 @@ function getCores(&$gpus,$adapter){
 	$gpus[$adapter][10] = $result[0][10];
 
 	//core max can't be trusted... statically assigning for now.
+	//6950s
 	if ($gpus[$adapter][1] == '6900'){$gpus[$adapter][7]=850;}
+	//6800
 	if ($gpus[$adapter][1] == '6800'){$gpus[$adapter][7]=875;}
-	if ($gpus[$adapter][1] == '5800'){$gpus[$adapter][7]=960;}
+
+	//5870 check max mem = 2000 to identify
+	if ( ($gpus[$adapter][1] == '5800') && ($gpus[$adapter][9] == '2000') ){$gpus[$adapter][7]=960;}
+	//5830 check max mem = 1300 to identify
+	if ( ($gpus[$adapter][1] == '5800') && ($gpus[$adapter][9] == '1300') ){$gpus[$adapter][7]=900;}
 
 }
 
