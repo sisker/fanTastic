@@ -313,7 +313,7 @@ function maintainGPUs($gpus){
 		if ( ($temp < ($optimalTemp-$toleranceTemp)) && ($fan<$warningFan) ){
 			//if the core isn't already at max and in use
 			if (($cocucl < $comax) && ($load>10)){
-				adjustCore($gpus,$adapter,$cocucl+5);
+				adjustCore($gpus,$adapter,$cocucl+1);
 				echo "increase core. ";
 			}
 		}
@@ -338,7 +338,7 @@ while (true){
 	//passthru('clear');
 	queryGpus($gpus);
 	maintainGPUs($gpus);
-	sleep(3);
+	sleep(5);
 }
 
 
