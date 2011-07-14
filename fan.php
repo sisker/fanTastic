@@ -251,8 +251,8 @@ function maintainGPUs($gpus){
 	$minFan = 5;
 
 	$warningLoad = 95;
-	$warningTemp = 80;
-	$warningFan = 80;
+	$warningTemp = 81;
+	$warningFan = 81;
 	$warningCore = 100;
 
 	$count = countGPUs();
