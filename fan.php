@@ -153,8 +153,8 @@ function queryGpus(&$gpus){
 	
 	while ($adapter<$num){
 		//Make an array for each gpu
-		//gpus	array |0      |1   |2     |3     |4     |5     |6    |7    |8    |9    |10  |11 |12  |13
-		//            |adapter|name|cocucl|mecucl|cocupe|mecupe|comin|comax|memin|memax|load|fan|temp|time
+		//gpus	array |0      |1   |2     |3     |4     |5     |6    |7    |8    |9    |10  |11 |12  |13  |14
+		//            |adapter|name|cocucl|mecucl|cocupe|mecupe|comin|comax|memin|memax|load|fan|temp|time|hashRate
 
 		//get cores info [0..10]
 		getCores($gpus,$adapter);
@@ -213,6 +213,7 @@ function printStatsShort($gpus,$adapter,$warningLoad,$warningTemp,$warningFan,$w
 	$fan=$gpus[$adapter][11];
 	$temp=$gpus[$adapter][12];
 	$time=$gpus[$adapter][13];
+	$hashRate=$gpus[$adapter][14];
 
 	$corePercent = number_format( ($cocucl/$comax)*100 );
 
@@ -255,11 +256,11 @@ function printStatsShort($gpus,$adapter,$warningLoad,$warningTemp,$warningFan,$w
 	}
 
 	//print out the stats
-	echo ("GPU$adapter: $cocucl($comin-$comax) $coreColor Load:$loadColor Temp:$tempColor Fan:$fanColor ");
+	echo ("GPU$adapter: $cocucl($comin-$comax) $coreColor Load:$loadColor Temp:$tempColor Fan:$fanColor MHs: $hashRate ");
 }
 
 function connectDB(&$dbConn){
-	$dbConn = mysql_connect("__HOST__","___USER___","___PASSWORD___");
+	$dbConn = mysql_connect("_HOST_","_USER_","_PASS_");
 	if (!$dbConn){
   		die('Could not connect: ' . mysql_error());
   	}
@@ -283,10 +284,11 @@ function writeStatsToDB($gpus,$dbConn){
 		$fan=$gpus[$adapter][11];
 		$temp=$gpus[$adapter][12];
 		$time=$gpus[$adapter][13];
+		$hashRate=$gpus[$adapter][14];
 		$host=gethostname();
 
-		$query = ("INSERT INTO miners (name,cocucl,mecucl,cocupe,mecupe,comin,comax,memin,memax,gpuLoad,fan,temp,logTime,host,adapter) 
-			  VALUES ('$name','$cocucl','$mecucl','$cocupe','$mecupe','$comin','$comax','$memin','$memax','$load','$fan','$temp','$time','$host','$adapter')");
+		$query = ("INSERT INTO miners (name,cocucl,mecucl,cocupe,mecupe,comin,comax,memin,memax,gpuLoad,fan,temp,logTime,host,adapter,hashRate) 
+			  VALUES ('$name','$cocucl','$mecucl','$cocupe','$mecupe','$comin','$comax','$memin','$memax','$load','$fan','$temp','$time','$host','$adapter','$hashRate')");
 
 		if (!mysql_query($query,$dbConn)){
   			die('Error: ' . mysql_error());
@@ -375,6 +377,39 @@ function maintainGPUs($gpus){
 	}
 }
 
+
+function getHashRate(&$gpus){
+	//open the logfile
+	$fileLocation = "/home/mattlyssy/DiabloMiner/output.txt";
+	$file = array();
+	$matches = array();
+	$file = file_get_contents($fileLocation);
+	
+	if ($file == NULL){
+		$matches[0]=0;
+	}
+	else{
+		$fh = fopen($fileLocation, 'w');
+		//preg_match("/\d*\.\d*/", $file, $matches);
+		preg_match("/\d+\.\d{1,2}/", $file, $matches);
+		fclose($fh);
+	}
+
+	if ($matches[0] == '.'){
+		$matches[0]=0;
+	}
+	//echo $matches[0];
+
+	//put the hashrate into gpu array
+	$count = countGPUs();
+	$adapter=0;
+	while ($adapter < $count){
+		$gpus[$adapter][14]=$matches[0];
+		$adapter++;
+	}
+
+}
+
 //////////////////////////////////////
 //////////////////////////////////////
 
@@ -384,12 +419,13 @@ connectDB($dbConn);
 queryGpus($gpus);
 echo ("\n");
 printStats($gpus);
-sleep(3);
+sleep(2);
 
 while (true){
 	//clear the screen
 	//passthru('clear');
 	queryGpus($gpus);
+	getHashRate($gpus);
 	writeStatsToDB($gpus,$dbConn);
 	maintainGPUs($gpus);
 	sleep(5);
